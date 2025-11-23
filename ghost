@@ -1,0 +1,23 @@
+#!/usr/bin/env guile
+!#
+
+;;; CLI wrapper for ghost in the guile shell
+
+(load "ghost.scm")
+
+;; Main entry point
+(define (main args)
+  (if (null? (cdr args))
+      (begin
+        (display "Usage: ./ghost <number-of-terms>\n")
+        (display "Example: ./ghost 20\n")
+        (exit 1))
+      (let ((n (string->number (cadr args))))
+        (if (and n (positive? n))
+            (display-sequence n)
+            (begin
+              (display "Error: Please provide a positive integer\n")
+              (exit 1))))))
+
+;; Run main
+(main (command-line))
