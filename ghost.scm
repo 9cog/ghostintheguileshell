@@ -20,14 +20,19 @@
 (hash-set! *memo* 0 0)
 (hash-set! *memo* 1 1)
 
-;; Helper function to find all divisors of n
+;; Helper function to find all divisors of n (optimized)
 (define (divisors n)
   "Return a list of all divisors of n"
-  (let loop ((d 1) (divs '()))
-    (cond
-      ((> d n) (reverse divs))
-      ((zero? (modulo n d)) (loop (+ d 1) (cons d divs)))
-      (else (loop (+ d 1) divs)))))
+  (if (<= n 0)
+      '()
+      (let loop ((d 1) (divs '()))
+        (cond
+          ((> (* d d) n) (sort divs <))
+          ((zero? (modulo n d))
+           (if (= d (/ n d))
+               (loop (+ d 1) (cons d divs))
+               (loop (+ d 1) (cons d (cons (/ n d) divs)))))
+          (else (loop (+ d 1) divs))))))
 
 ;; Compute sum_{d|k} d * a(d)
 (define (divisor-sum k)
@@ -39,6 +44,8 @@
 (define (rooted-trees n)
   "Compute the number of rooted trees with n nodes"
   (cond
+    ((not (and (integer? n) (>= n 0)))
+     (error "rooted-trees: argument must be a non-negative integer" n))
     ((hash-ref *memo* n) => (lambda (val) val))
     (else
      (let* ((n-1 (- n 1))
